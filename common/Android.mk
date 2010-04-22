@@ -85,6 +85,13 @@ LOCAL_C_INCLUDES +=       \
 LOCAL_CFLAGS  += -D_REENTRANT -DPIC -DU_COMMON_IMPLEMENTATION -fPIC 
 LOCAL_CFLAGS  +=  -O3
 
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+LOCAL_CFLAGS  +=  -DU_IS_BIG_ENDIAN=1
+endif
+endif
+
+
 ifneq ($(TARGET_SIMULATOR),true)
 # TODO: Rename ARM_FLAG to something else. Even better, based on
 # the usage of this in the files, it should probably be replaced with
