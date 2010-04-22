@@ -94,7 +94,16 @@ else
 endif
 
 intermediates := $(call local-intermediates-dir)
+
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+icu_data_file := $(LOCAL_PATH)/icudt38b-us-japan.dat
+else
 icu_data_file := $(LOCAL_PATH)/icudt38l-us-japan.dat
+endif
+else
+icu_data_file := $(LOCAL_PATH)/icudt38l-us-japan.dat
+endif
 
 asm_file := $(intermediates)/icu_data_jp.S
 LOCAL_GENERATED_SOURCES += $(asm_file)
@@ -124,7 +133,16 @@ else
 endif
 
 intermediates := $(call local-intermediates-dir)
+
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+icu_data_file := $(LOCAL_PATH)/icudt38b-large.dat
+else
 icu_data_file := $(LOCAL_PATH)/icudt38l-large.dat
+endif
+else
+icu_data_file := $(LOCAL_PATH)/icudt38l-large.dat
+endif
 
 asm_file := $(intermediates)/icu_data_large.S
 LOCAL_GENERATED_SOURCES += $(asm_file)
@@ -154,7 +172,16 @@ else
 endif
 
 intermediates := $(call local-intermediates-dir)
+
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+icu_data_file := $(LOCAL_PATH)/icudt38b-us-euro.dat
+else
 icu_data_file := $(LOCAL_PATH)/icudt38l-us-euro.dat
+endif
+else
+icu_data_file := $(LOCAL_PATH)/icudt38l-us-euro.dat
+endif
 
 asm_file := $(intermediates)/icu_data_eu.S
 LOCAL_GENERATED_SOURCES += $(asm_file)
@@ -184,7 +211,16 @@ else
 endif
 
 intermediates := $(call local-intermediates-dir)
+
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+icu_data_file := $(LOCAL_PATH)/icudt38b-default.dat
+else
 icu_data_file := $(LOCAL_PATH)/icudt38l-default.dat
+endif
+else
+icu_data_file := $(LOCAL_PATH)/icudt38l-default.dat
+endif
 
 asm_file := $(intermediates)/icu_data_default.S
 LOCAL_GENERATED_SOURCES += $(asm_file)
@@ -214,7 +250,16 @@ else
 endif
 
 intermediates := $(call local-intermediates-dir)
+
+ifeq ($(TARGET_ARCH),mips)
+ifeq ($(TARGET_CPU_ENDIAN),EB)
+icu_data_file := $(LOCAL_PATH)/icudt38b-us.dat
+else
 icu_data_file := $(LOCAL_PATH)/icudt38l-us.dat
+endif
+else
+icu_data_file := $(LOCAL_PATH)/icudt38l-us.dat
+endif
 
 asm_file := $(intermediates)/icu_data_us.S
 LOCAL_GENERATED_SOURCES += $(asm_file)
