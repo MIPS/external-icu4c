@@ -55,10 +55,10 @@ src_files := \
 	ustring.c          ustrtrns.c         \
 	ustr_wcs.c         utf_impl.c         \
 	utrace.c           utrie.c            \
- 	utypes.c           wintz.c            \
- 	utrie2.c           utrie2_builder.c   \
- 	propsvec.c         ulist.c            \
- 	uloc_tag.c
+	utypes.c           wintz.c            \
+	utrie2.c           utrie2_builder.c   \
+	propsvec.c         ulist.c            \
+	uloc_tag.c
 
 src_files += \
         bmpset.cpp      unisetspan.cpp   \
@@ -90,11 +90,11 @@ src_files += \
 	usprep.cpp      ustack.cpp       \
 	ustrenum.cpp    utext.cpp        \
 	util.cpp        util_props.cpp   \
- 	uvector.cpp     uvectr32.cpp     \
- 	errorcode.cpp                    \
- 	bytestream.cpp stringpiece.cpp   \
- 	mutex.cpp       dtintrv.cpp      \
- 	ucnvsel.cpp
+	uvector.cpp     uvectr32.cpp     \
+	errorcode.cpp                    \
+	bytestream.cpp stringpiece.cpp   \
+	mutex.cpp       dtintrv.cpp      \
+	ucnvsel.cpp
 
 c_includes := \
 	$(LOCAL_PATH) \
@@ -112,6 +112,10 @@ LOCAL_C_INCLUDES := $(c_includes)
 
 LOCAL_CFLAGS += -D_REENTRANT -DPIC -DU_COMMON_IMPLEMENTATION -fPIC
 LOCAL_CFLAGS += -O3
+
+ifeq ($(ARCH_HAS_BIGENDIAN),true)
+    LOCAL_CFLAGS  += -DU_IS_BIG_ENDIAN=1
+endif
 
 LOCAL_SHARED_LIBRARIES += libicudata
 LOCAL_LDLIBS += -lpthread -lm

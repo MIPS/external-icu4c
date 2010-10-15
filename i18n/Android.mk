@@ -62,16 +62,16 @@ src_files += \
 	umsg.cpp        unesctrn.cpp uni2name.cpp \
 	unum.cpp        uregexc.cpp  uregex.cpp   \
 	usearch.cpp     utrans.cpp   windtfmt.cpp \
- 	winnmfmt.cpp    zonemeta.cpp zstrfmt.cpp  \
- 	numsys.cpp      chnsecal.cpp \
- 	cecal.cpp       coptccal.cpp ethpccal.cpp \
- 	brktrans.cpp    wintzimpl.cpp plurrule.cpp \
- 	plurfmt.cpp     dtitvfmt.cpp dtitvinf.cpp \
- 	tmunit.cpp      tmutamt.cpp  tmutfmt.cpp  \
- 	colldata.cpp    bmsearch.cpp bms.cpp      \
-        currpinf.cpp    uspoof.cpp   uspoof_impl.cpp \
-        uspoof_build.cpp uspoof_buildconf.cpp     \
- 	uspoof_buildwsconf.cpp
+	winnmfmt.cpp    zonemeta.cpp zstrfmt.cpp  \
+	numsys.cpp      chnsecal.cpp \
+	cecal.cpp       coptccal.cpp ethpccal.cpp \
+	brktrans.cpp    wintzimpl.cpp plurrule.cpp \
+	plurfmt.cpp     dtitvfmt.cpp dtitvinf.cpp \
+	tmunit.cpp      tmutamt.cpp  tmutfmt.cpp  \
+	colldata.cpp    bmsearch.cpp bms.cpp      \
+	currpinf.cpp    uspoof.cpp   uspoof_impl.cpp \
+	uspoof_build.cpp uspoof_buildconf.cpp     \
+	uspoof_buildwsconf.cpp
 
 c_includes = \
 	$(LOCAL_PATH) \
@@ -89,6 +89,10 @@ LOCAL_C_INCLUDES := $(c_includes)
 
 LOCAL_CFLAGS += -D_REENTRANT -DPIC -DU_I18N_IMPLEMENTATION -fPIC 
 LOCAL_CFLAGS += -O3
+
+ifeq ($(ARCH_HAS_BIGENDIAN),true)
+    LOCAL_CFLAGS  += -DU_IS_BIG_ENDIAN=1
+endif
 
 LOCAL_SHARED_LIBRARIES += libicuuc libicudata
 LOCAL_LDLIBS += -lpthread -lm

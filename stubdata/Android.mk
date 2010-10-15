@@ -72,6 +72,12 @@ config := $(word 1, \
             us)
 
 icu_var_name := icudt42_dat
+ifeq ($(ARCH_HAS_BIGENDIAN),true)
+  endian = b
+else
+  endian = l
+endif
+
 
 
 #
@@ -83,7 +89,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libicudata-jp
 
 required_config := us-japan
-data_file_name := icudt42l-us-japan.dat
+data_file_name := icudt42$(endian)-us-japan.dat
 output_file_name := icu_data_jp.S
 
 include $(LOCAL_PATH)/IcuData.mk
@@ -98,7 +104,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libicudata-large
 
 required_config := large
-data_file_name := icudt42l-large.dat
+data_file_name := icudt42$(endian)-large.dat
 output_file_name := icu_data_large.S
 
 include $(LOCAL_PATH)/IcuData.mk
@@ -113,7 +119,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libicudata-eu
 
 required_config := us-euro
-data_file_name := icudt42l-us-euro.dat
+data_file_name := icudt42$(endian)-us-euro.dat
 output_file_name := icu_data_eu.S
 
 include $(LOCAL_PATH)/IcuData.mk
@@ -128,7 +134,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libicudata-default
 
 required_config := default
-data_file_name := icudt42l-default.dat
+data_file_name := icudt42$(endian)-default.dat
 output_file_name := icu_data_default.S
 
 include $(LOCAL_PATH)/IcuData.mk
@@ -143,7 +149,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libicudata-us
 
 required_config := us
-data_file_name := icudt42l-us.dat
+data_file_name := icudt42$(endian)-us.dat
 output_file_name := icu_data_us.S
 
 include $(LOCAL_PATH)/IcuData.mk

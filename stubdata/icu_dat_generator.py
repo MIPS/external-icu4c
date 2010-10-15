@@ -76,30 +76,34 @@ def GetIcuPrebuiltDir():
                       "..", "icu-" + ICU_VERSION)
 
 
-def ExtractAllResourceToTempDir():
-  # copy icudtxxl-all.dat to icudtxxl.dat
+def ExtractAllResourceToTempDir(endian):
+  # copy icudtxx[lb]-all.dat to icudtxx[lb].dat
   source_dat = os.path.join(ANDROID_ROOT, "external", "icu4c", "stubdata",
-                            ICUDATA + "-all.dat")
+                            ICUDATA + endian + "-all.dat")
   dest_dat = os.path.join(ANDROID_ROOT, "external", "icu4c", "stubdata",
-                          ICUDATA_DAT)
+                          ICUDATA + endian + ".dat")
   shutil.copyfile(source_dat, dest_dat)
   InvokeIcuTool("icupkg", None, [dest_dat, "-x", "*", "-d", TMP_DAT_PATH])
 
 
-def MakeDat(icu_dat_path, dat_name):
-  # Get the resource list. e.g. icudt42l-us.txt, icudt42l-default.txt.
-  dat_list_file_path = os.path.join(icu_dat_path, ICUDATA + "-" + dat_name +
+def MakeDat(icu_dat_path, dat_name, endian):
+  # Get the resource list. e.g. icudt42[lb]-us.txt, icudt42[lb]-default.txt.
+  dat_list_file_path = os.path.join(icu_dat_path, ICUDATA + endian + "-" + dat_name +
                                     ".txt")
+  # Try the little endian version if the endianess specific version doesn't exist
   if not os.path.isfile(dat_list_file_path):
-    print "%s not present for resource list." % dat_list_file_path
-    return
+    dat_list_file_path = os.path.join(icu_dat_path, ICUDATA + 'l' + "-" + dat_name +
+                                    ".txt")
+    if not os.path.isfile(dat_list_file_path):
+      print "%s not present for resource list." % dat_list_file_path
+      return
   GenResIndex(dat_list_file_path)
   CopyAndroidCnvFiles(icu_dat_path)
   os.chdir(TMP_DAT_PATH)
-  # Run command such as "icupkg -tl -s icudt42l -a icudt42l-us.txt
-  # new icudt42l.dat"
-  InvokeIcuTool("icupkg", None, ["-tl", "-s", TMP_DAT_PATH, "-a", dat_list_file_path, "new",
-                ICUDATA_DAT])
+  # Run command such as "icupkg -t[lb] -s icudt42[lb] -a icudt42[lb]-us.txt
+  # new icudt42[lb].dat"
+  InvokeIcuTool("icupkg", None, ["-t" + endian, "-s", TMP_DAT_PATH, "-a", dat_list_file_path, "new",
+                ICUDATA + endian + ".dat"])
 
 
 # Open dat file such as icudt42l-us.txt.
@@ -185,15 +189,42 @@ def CopyAndroidCnvFiles(icu_dat_path):
     if VERBOSE:
       print "copy " + source_path + " " + dest_path
 
+def Generate(endian):
+  global TMP_DAT_PATH  # temp directory to store all resource files and
+                       # intermittent dat files.
+  # Check for required source files.
+  icu_dat_path = os.path.join(ANDROID_ROOT, "external", "icu4c", "stubdata")
+  full_data_filename = os.path.join(icu_dat_path, ICUDATA + endian + "-all.dat")
+  if not os.path.isfile(full_data_filename):
+    print "%s not present." % full_data_filename
+    return
+
+  # Create a temporary working directory.
+  TMP_DAT_PATH = os.path.join(ANDROID_ROOT, "external", "icu4c", "tmp")
+  if os.path.exists(TMP_DAT_PATH):
+    shutil.rmtree(TMP_DAT_PATH)
+  os.mkdir(TMP_DAT_PATH)
+
+  # Extract resource files from icudtxx[lb]-all.dat to TMP_DAT_PATH.
+  ExtractAllResourceToTempDir(endian)
+
+  datlist = ["us", "us-euro", "default", "us-japan", "zh", "large"]
+  for dat_subtag in datlist:
+    MakeDat(icu_dat_path, dat_subtag, endian)
+    # Copy icudtxx[lb].dat to stubdata directory with corresponding subtag.
+    shutil.copyfile(os.path.join(TMP_DAT_PATH, ICUDATA + endian + ".dat"),
+                    os.path.join(icu_dat_path, ICUDATA + endian + "-" + dat_subtag + ".dat"))
+    print "Generate ICU data:" + os.path.join(icu_dat_path, ICUDATA + endian + "-" + dat_subtag + ".dat")
+
+  # Cleanup temporary working directory and icudtxx[lb].dat
+  shutil.rmtree(TMP_DAT_PATH)
+  os.remove(os.path.join(icu_dat_path, ICUDATA + endian + ".dat"))
 
 def main():
   global ANDROID_ROOT  # Android project home directory
   global ICU_VERSION   # ICU version number
-  global ICUDATA       # e.g. "icudt42l"
-  global ICUDATA_DAT   # e.g. "icudt42l.dat"
+  global ICUDATA       # e.g. "icudt42"
   global CLDR_VERSION  # CLDR version. The value can be vary upon ICU release.
-  global TMP_DAT_PATH  # temp directory to store all resource files and
-                       # intermittent dat files.
   global HELP
   global VERBOSE
 
@@ -207,10 +238,9 @@ def main():
   if (version ==  -1):
     print sys.argv[1] + " is not a valid icu version number!"
     return
-  ICUDATA = "icudt" + version + "l"
+  ICUDATA = "icudt" + version
   CLDR_VERSION = "1.7"
   ANDROID_ROOT = os.environ.get("ANDROID_BUILD_TOP")
-  ICUDATA_DAT = ICUDATA + ".dat"
   HELP = False
   VERBOSE = False
 
@@ -227,34 +257,8 @@ def main():
     elif opt in ('-v', '--verbose'):
       VERBOSE = True
 
-
-  # Check for requiered source files.
-  icu_dat_path = os.path.join(ANDROID_ROOT, "external", "icu4c", "stubdata")
-  full_data_filename = os.path.join(icu_dat_path, ICUDATA + "-all.dat")
-  if not os.path.isfile(full_data_filename):
-    print "%s not present." % full_data_filename
-    return
-
-  # Create a temporary working directory.
-  TMP_DAT_PATH = os.path.join(ANDROID_ROOT, "external", "icu4c", "tmp")
-  if os.path.exists(TMP_DAT_PATH):
-    shutil.rmtree(TMP_DAT_PATH)
-  os.mkdir(TMP_DAT_PATH)
-
-  # Extract resource files from icudtxxl-all.dat to TMP_DAT_PATH.
-  ExtractAllResourceToTempDir()
-
-  datlist = ["us", "us-euro", "default", "us-japan", "zh", "large"]
-  for dat_subtag in datlist:
-    MakeDat(icu_dat_path, dat_subtag)
-    # Copy icudtxxl.dat to stubdata directory with corresponding subtag.
-    shutil.copyfile(os.path.join(TMP_DAT_PATH, ICUDATA_DAT),
-                    os.path.join(icu_dat_path, ICUDATA + "-" + dat_subtag + ".dat"))
-    print "Generate ICU data:" + os.path.join(icu_dat_path, ICUDATA + "-" + dat_subtag + ".dat")
-
-  # Cleanup temporary working directory and icudtxxl.dat
-  shutil.rmtree(TMP_DAT_PATH)
-  os.remove(os.path.join(icu_dat_path, ICUDATA_DAT))
+  Generate('l')
+  Generate('b')
 
 if __name__ == "__main__":
   main()
