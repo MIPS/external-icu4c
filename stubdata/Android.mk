@@ -73,8 +73,16 @@ config := $(word 1, \
 
 include $(LOCAL_PATH)/root.mk
 
-PRODUCT_COPY_FILES += $(LOCAL_PATH)/$(root)-$(config).dat:/system/usr/icu/$(root).dat
+
+ifeq ($(ARCH_HAS_BIGENDIAN),true)
+  endian = b
+else
+  endian = l
+endif
+
+PRODUCT_COPY_FILES += $(LOCAL_PATH)/$(root)$(endian)-$(config).dat:/system/usr/icu/$(root)$(endian).dat
+
 
 ifeq ($(WITH_HOST_DALVIK),true)
-    $(eval $(call copy-one-file,$(LOCAL_PATH)/$(root)-$(config).dat,$(HOST_OUT)/usr/icu/$(root).dat))
+    $(eval $(call copy-one-file,$(LOCAL_PATH)/$(root)$(endian)-$(config).dat,$(HOST_OUT)/usr/icu/$(root)$(endian).dat))
 endif

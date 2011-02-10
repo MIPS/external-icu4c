@@ -190,10 +190,12 @@ typedef unsigned int uint32_t;
 /* Determines the endianness of the platform
    It's done this way in case multiple architectures are being built at once.
    For example, Darwin supports fat binaries, which can be both PPC and x86 based. */
+#if ! defined (U_IS_BIG_ENDIAN)
 #if defined(BYTE_ORDER) && defined(BIG_ENDIAN)
 #define U_IS_BIG_ENDIAN (BYTE_ORDER == BIG_ENDIAN)
 #else
 #define U_IS_BIG_ENDIAN 0
+#endif
 #endif
 
 /* 1 or 0 to enable or disable threads.  If undefined, default is: enable threads. */

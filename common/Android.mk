@@ -54,10 +54,10 @@ src_files := \
 	ustring.c          ustrtrns.c         \
 	ustr_wcs.c         utf_impl.c         \
 	utrace.c           utrie.c            \
- 	utypes.c           wintz.c            \
- 	utrie2_builder.c   icuplug.c          \
- 	propsvec.c         ulist.c            \
- 	uloc_tag.c
+	utypes.c           wintz.c            \
+	utrie2_builder.c   icuplug.c          \
+	propsvec.c         ulist.c            \
+	uloc_tag.c
 
 src_files += \
         bmpset.cpp      unisetspan.cpp   \
@@ -129,6 +129,11 @@ LOCAL_C_INCLUDES := $(c_includes)
 LOCAL_CFLAGS := $(local_cflags) -DPIC -fPIC
 LOCAL_LDLIBS += $(local_ldlibs)
 LOCAL_MODULE_TAGS := optional
+
+ifeq ($(ARCH_HAS_BIGENDIAN),true)
+    LOCAL_CFLAGS  += -DU_IS_BIG_ENDIAN=1
+endif
+
 LOCAL_MODULE := libicuuc
 include $(BUILD_SHARED_LIBRARY)
 
