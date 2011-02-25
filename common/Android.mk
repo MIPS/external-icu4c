@@ -143,13 +143,19 @@ include $(BUILD_SHARED_LIBRARY)
 #
 
 ifeq ($(WITH_HOST_DALVIK),true)
+    ifeq ($(ARCH_HAS_BIGENDIAN),true)
+       endian = b
+    else
+       endian = l
+    endif
+
     include $(CLEAR_VARS)
     include $(LOCAL_PATH)/../stubdata/root.mk
     LOCAL_SRC_FILES := $(src_files)
     LOCAL_C_INCLUDES := $(c_includes)
     LOCAL_CFLAGS := $(local_cflags)
     LOCAL_LDLIBS += $(local_ldlibs)
-    LOCAL_ADDITIONAL_DEPENDENCIES += $(HOST_OUT)/usr/icu/$(root).dat
+    LOCAL_ADDITIONAL_DEPENDENCIES += $(HOST_OUT)/usr/icu/$(root)$(endian).dat
     LOCAL_MODULE_TAGS := optional
     LOCAL_MODULE := libicuuc
     include $(BUILD_HOST_SHARED_LIBRARY)
